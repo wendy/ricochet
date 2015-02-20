@@ -1,0 +1,35 @@
+body{
+  margin: 0;
+  position: relative;
+}
+
+.blocks{
+  fill: #F0E4D8;
+  stroke: white;
+  stroke-width: 1px;
+  border-top: 1px solid red;
+}
+
+td {
+  border: 1px solid black;
+  height: 20px;
+  width: 20px;
+  background-color: blue;
+}
+
+.div{
+  background-color: yellow;
+}
+
+.blockers{
+  fill: black;
+}
+
+.topBlockers{
+  fill: black;
+}
+
+.line{
+  width: 2px;
+  height: 38px;
+}

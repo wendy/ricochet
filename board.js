@@ -16,7 +16,7 @@ var block = settings.width/16;
 var blockData = generateArr(16);
 
 var player = {
-  data: ['orange','blue','yellow','green'],
+  data: ['orange','blue','red','green'],
   radius: 14,
   offset: block/2,
 }
@@ -32,22 +32,36 @@ var board = d3.selectAll('body')
 var randomBlockXY = function(){ return (Math.floor(Math.random() * 16) * block) + player.offset; }
 
 var blocks = board.selectAll('.blocks')
-  .data( blockData )
-  .enter()
-  .append('svg:rect')
+  .data( blockData ).enter().append('svg:rect')
   .attr( 'class', 'blocks' )
+  .attr( 'id', function(d,i){return "block-" + i} )
   .attr( 'x', function(d, i){return (i % 16) * settings.width/16} )
   .attr( 'y', function(d, i){return d * settings.width/16} )
   .attr( 'width', settings.width/16 )
   .attr( 'height', settings.width/16 )
 
+board.select("#block-119").attr("class", "black")
+board.select("#block-120").attr("class", "black")
+board.select("#block-135").attr("class", "black")
+board.select("#block-136").attr("class", "black")
 
-blocks.data(blockData).each(function(d){console.log(d)})
+var syms = ['&#10052;','&#10026;', '&#10050;'];
+var landmark = [[2,4, syms[0],player.data[0]], [1,9,syms[0],player.data[1]],[11,14,syms[0],player.data[2]],[11,6,syms[0],player.data[3]],
+               [4,10,syms[1],player.data[0]],[12,9,syms[1],player.data[1]],[13,1,syms[1],player.data[2]],[9,12,syms[1],player.data[3]],
+               [14,13,syms[2], player.data[0]], [5,2,syms[2], player.data[1]],[7,5,syms[2], player.data[2]], [3,14,syms[2], player.data[3]]]
+var landmarks = board.selectAll('.landmarks')
+  .data(landmark).enter().append('text')
+  .attr('class', '.landmarks')
+  .attr("x", function(d) { return d[0] * block + 7})
+  .attr("y", function(d) { return d[1] * block + 33})
+  .attr("font-size", "35px")
+  .html( function(d) { return d[2] })
+  .attr("fill", function(d){ return d[3]})
+  .attr("opacity", "0.6")
 
 var currentObject = null;
 var players = board.selectAll('.players')
-  .data(player.data)
-  .enter().append('circle')
+  .data(player.data).enter().append('circle')
   .attr('class', 'players')
   .attr({
     cx: function(d){ return randomBlockXY(); },
@@ -72,8 +86,7 @@ var _lineData = [[7,7],[8,7],[7,9],[8,9],[0,5],[0,12],[15,10],[14,14],[1,10],[2,
 //(x = columns, y = rows--)
 
 var lline = board.selectAll('.llines')
-  .data(llineData)
-  .enter().append('rect')
+  .data(llineData).enter().append('rect')
   .attr('class', 'lline')
   .attr({
     'x': function(d){ return d[0] * block },
@@ -83,8 +96,7 @@ var lline = board.selectAll('.llines')
   })
 
 var _line = board.selectAll('._lines')
-  .data(_lineData)
-  .enter().append('rect')
+  .data(_lineData).enter().append('rect')
   .attr('class', '_line')
   .attr({
     'x': function(d){ return d[0] * block },
@@ -134,7 +146,6 @@ function updateLeftRight(data, LorR){
   for( var i = 0; i < players[0].length; i++ ){
     var circleY = Math.floor(players[0][i].cy.animVal.value/block);
     var circleX = Math.floor(players[0][i].cx.animVal.value/block);
-    console.log(circleY, circleX)
     if( circleY === playerY && circleX !== playerX){
       if( left === true ){
         circleX += 1;
@@ -224,28 +235,3 @@ d3.select("body")
       }      
     }
   });
-
-//*****************************************************************************
-
-  // .on("mouseover", function(d){
-  //   d3.select(this).attr("fill", "red");
-  // })
-  // .on("mouseout", function(d){
-  //   d3.select(this).attr("fill", function(d){ return d; });
-  // })
-
-// var blockers = board.selectAll('.blockers')
-//   .data([[266,266],[266,304],[342,266],[342,304],[114,152],[76, 342],[152,0],[456,0],[266,570],[532,570],[228,76],[152,380],[342,456],[228,304],[114,532],[456,228],[228,494],[266,190],[456,532],[494,342],[532,190],[532,494]]).enter().append('rect')
-//   .attr('class', 'blockers')
-//   .attr( 'x', function(d){ return d[0]} )
-//   .attr( 'y', function(d){ return d[1]} )
-//   .attr( 'width', 3)
-//   .attr( 'height', settings.height/16)
-
-// var topBlockers = board.selectAll('.topBlockers')
-//   .data([[266,266],[304,266],[266,342],[304,342],[0,190],[0,456],[76, 152],[38,380],[570,152],[570,380],[190,114],[152,418],[342,456],[190,304],[114,532],[418,228],[190,494],[266,228],[418,570],[456,342],[532,228],[532,532]]).enter().append('rect')
-//   .attr('class', 'topBlockers')
-//   .attr( "x", function(d){ return d[0]} )
-//   .attr( 'y', function(d){ return d[1]} )
-//   .attr( 'width', settings.height/16 )
-//   .attr( 'height', 3 )

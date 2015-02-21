@@ -1,36 +1,43 @@
-var generateArr = function(number){
-  var array = [];
-  for( var value = 0; value < number; value++ ){    
-    for( var index = 0; index < number; index++ ){
-      array.push(value);
-    }
-  }
-  return array;
-}
+var currentObject = null;
+var target = getTarget();
+var steps = 0;
+console.log(target[0][2]);
 
-var settings = {
-  width: 608,
-  height: 608,
-};
-var block = settings.width/16;
-var blockData = generateArr(16);
-
-var player = {
-  data: ['orange','blue','red','green'],
-  radius: 14,
-  offset: block/2,
-}
-
-
-var board = d3.selectAll('body')
+//Creates SVG Board
+var bigboard = d3.selectAll('#board')
   .append('svg')
-  .attr( 'class', 'board')
+  .attr( 'class', 'bigboard')
+  .attr( 'width', settings.width + 100)
+  .attr( 'height', settings.height)
+
+var board = d3.selectAll('.bigboard')
+  .attr('class', 'board')
   .attr( 'width', settings.width )
   .attr( 'height', settings.height )
+  
+
+var tokenBoard = d3.selectAll('.bigboard')
+  .data([0]).enter().append('svg')
+  .attr('class', 'tokenBoard')
+  .attr( 'width', settings.tokenH )
+  .attr( 'height', settings.height )
+
+var tokens = tokenBoard.selectAll('.tokens')
+  .data(landmark).enter().append('text')
+  .attr('class', 'tokens')
+  .attr( 'id', function(d,i){return "token-" + i} )
+  .attr("x", function(d) { return 7})
+  .attr("y", function(d,i) { return i * (block + 10) + 45})
+  .attr("font-size", "35px")
+  .html( function(d) { return d[2] })
+  .attr("fill", function(d){ return d[3]})
+  .attr("opacity", "0.8")
+
+// d3.select("#token-1").
 
 
-var randomBlockXY = function(){ return (Math.floor(Math.random() * 16) * block) + player.offset; }
 
+//Creates SVG Blocks on Board
 var blocks = board.selectAll('.blocks')
   .data( blockData ).enter().append('svg:rect')
   .attr( 'class', 'blocks' )
@@ -40,18 +47,16 @@ var blocks = board.selectAll('.blocks')
   .attr( 'width', settings.width/16 )
   .attr( 'height', settings.width/16 )
 
+//Creates Square Center Block on Board
 board.select("#block-119").attr("class", "black")
 board.select("#block-120").attr("class", "black")
 board.select("#block-135").attr("class", "black")
 board.select("#block-136").attr("class", "black")
 
-var syms = ['&#10052;','&#10026;', '&#10050;'];
-var landmark = [[2,4, syms[0],player.data[0]], [1,9,syms[0],player.data[1]],[11,14,syms[0],player.data[2]],[11,6,syms[0],player.data[3]],
-               [4,10,syms[1],player.data[0]],[12,9,syms[1],player.data[1]],[13,1,syms[1],player.data[2]],[9,12,syms[1],player.data[3]],
-               [14,13,syms[2], player.data[0]], [5,2,syms[2], player.data[1]],[7,5,syms[2], player.data[2]], [3,14,syms[2], player.data[3]]]
+//Puts LandMarks Pieces on Board
 var landmarks = board.selectAll('.landmarks')
   .data(landmark).enter().append('text')
-  .attr('class', '.landmarks')
+  .attr('class', 'landmarks')
   .attr("x", function(d) { return d[0] * block + 7})
   .attr("y", function(d) { return d[1] * block + 33})
   .attr("font-size", "35px")
@@ -59,7 +64,7 @@ var landmarks = board.selectAll('.landmarks')
   .attr("fill", function(d){ return d[3]})
   .attr("opacity", "0.6")
 
-var currentObject = null;
+//Creates Players on Board
 var players = board.selectAll('.players')
   .data(player.data).enter().append('circle')
   .attr('class', 'players')
@@ -81,10 +86,7 @@ var players = board.selectAll('.players')
     currentObject = this;
   })
 
-var llineData = [[7,7],[7,8],[9,7],[9,8],[4,0],[12,0],[7,15],[14,15],[2,9],[3,4],[6,2],[6,8],[4,10],[3,14],[6,13],[7,5],[9,12],[12,6],[12,14],[13,9],[13,1],[14,5],[14,13]];
-var _lineData = [[7,7],[8,7],[7,9],[8,9],[0,5],[0,12],[15,10],[14,14],[1,10],[2,4],[5,3],[5,8],[4,11],[5,13],[3,14],[7,6],[9,12],[11,6],[12,9],[11,15],[13,1],[14,6],[15,4]];
-//(x = columns, y = rows--)
-
+//Creates Vertical Blockers on Board
 var lline = board.selectAll('.llines')
   .data(llineData).enter().append('rect')
   .attr('class', 'lline')
@@ -95,6 +97,7 @@ var lline = board.selectAll('.llines')
     'height': block
   })
 
+//Creates Horizontal Blockers on Board
 var _line = board.selectAll('._lines')
   .data(_lineData).enter().append('rect')
   .attr('class', '_line')
@@ -105,8 +108,8 @@ var _line = board.selectAll('._lines')
     'height': 3
   })
 
+//Move Function
 var moving = false;
-
 function updateLeftRight(data, LorR){
   moving = true;
   var playerY = Math.floor(data.cy.animVal.value/block);
@@ -153,12 +156,18 @@ function updateLeftRight(data, LorR){
       change(circleX);   
     }
   }
+
+  if( closestBlock[1] !== playerX ){
+    steps += 1;
+  }
   //move currentObject
   d3.select(data).transition().duration(200)
     .attr({
         cx: (closestBlock[1] * 38) + player.offset
     })
     .each("end", function(){ moving = false;})
+
+  console.log(steps)
 }
 
 function updateTopBot(data, TorB){
@@ -210,17 +219,24 @@ function updateTopBot(data, TorB){
       }
     }
 
+    if( closestBlock[1] !== playerY ){
+      steps += 1;
+    }
+
     //move currentObject
     d3.select(data).transition().duration(200)
       .attr({
           cy: (closestBlock[1] * 38) + player.offset
       })
       .each("end", function(){ moving = false;})
+
+    console.log(steps);
   }
 
+//Keyboard Events
 d3.select("body")
   .on("keydown", function() {
-    if( moving === false ){
+    if( moving === false && currentObject !== null){
       if( d3.event.keyCode === 37 ){
         updateLeftRight(currentObject, "left"); 
       }

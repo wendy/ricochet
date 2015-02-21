@@ -3,9 +3,24 @@ body{
   position: relative;
 }
 
+
 .board{
   border: 3px solid black;
+  float:left;
 }
+
+.tokenBoard{
+  margin-left: 5px;
+  background-color: #FFEBD6;
+  border: 3px solid black;
+  float:left;
+}
+
+/*.tokens {
+  stroke: white;
+  stroke-width: 3px;
+  stroke-opacity: 0.2;
+}*/
 
 .blocks{
   fill: #F0E4D8;

@@ -1,41 +1,19 @@
 var currentObject = null;
-var target = getTarget();
-var steps = 0;
-console.log(target[0][2]);
 
-//Creates SVG Board
+
+//Creates SVG Body
 var bigboard = d3.selectAll('#board')
   .append('svg')
   .attr( 'class', 'bigboard')
   .attr( 'width', settings.width + 100)
   .attr( 'height', settings.height)
 
+//Creates SVG Board
 var board = d3.selectAll('.bigboard')
   .attr('class', 'board')
   .attr( 'width', settings.width )
   .attr( 'height', settings.height )
   
-
-var tokenBoard = d3.selectAll('.bigboard')
-  .data([0]).enter().append('svg')
-  .attr('class', 'tokenBoard')
-  .attr( 'width', settings.tokenH )
-  .attr( 'height', settings.height )
-
-var tokens = tokenBoard.selectAll('.tokens')
-  .data(landmark).enter().append('text')
-  .attr('class', 'tokens')
-  .attr( 'id', function(d,i){return "token-" + i} )
-  .attr("x", function(d) { return 7})
-  .attr("y", function(d,i) { return i * (block + 10) + 45})
-  .attr("font-size", "35px")
-  .html( function(d) { return d[2] })
-  .attr("fill", function(d){ return d[3]})
-  .attr("opacity", "0.8")
-
-// d3.select("#token-1").
-
-
 
 //Creates SVG Blocks on Board
 var blocks = board.selectAll('.blocks')
@@ -64,13 +42,31 @@ var landmarks = board.selectAll('.landmarks')
   .attr("fill", function(d){ return d[3]})
   .attr("opacity", "0.6")
 
+var coasters = board.selectAll('.coasters')
+  .data(player.data).enter().append('rect')
+  .attr('class', 'coasters')
+  .attr( 'id', function(d,i){return "coaster-" + i} )
+  .attr({
+    'x': function(d){ return randomBlockXY(); },
+    'y': function(d){ return randomBlockXY(); },
+    'width': block,
+    'height': block,
+    'fill': function(d){ return d; },
+    'opacity': .2
+  })
+
+    // 'x': function(d, i){ return Math.floor(d3.select('#player-' + i)[0][0].cx.animVal.value/block) * block},
+    // 'y': function(d, i){ return Math.floor(d3.select('#player-' + i)[0][0].cy.animVal.value/block) * block},
+
 //Creates Players on Board
 var players = board.selectAll('.players')
   .data(player.data).enter().append('circle')
   .attr('class', 'players')
+  .attr( 'id', function(d,i){return "player-" + i} )
+  .attr('class', function(d){ return d})
   .attr({
-    cx: function(d){ return randomBlockXY(); },
-    cy: function(d){ return randomBlockXY(); },
+    cx: function(d,i){ return d3.select('#coaster-' + i)[0][0].x.animVal.value + player.offset},
+    cy: function(d,i){ return d3.select('#coaster-' + i)[0][0].y.animVal.value + player.offset},
     r: player.radius,
     fill: function(d){ return d; }
   })
@@ -167,7 +163,12 @@ function updateLeftRight(data, LorR){
     })
     .each("end", function(){ moving = false;})
 
-  console.log(steps)
+  updateSteps();
+  console.log(target[0][0], closestBlock[1], target[0][1],playerY)
+  if( target[0][0] === closestBlock[1] && target[0][1] === playerY && d3.select(currentObject).classed(target[0][3]) ){
+    console.log("yay");
+  }
+
 }
 
 function updateTopBot(data, TorB){
@@ -230,24 +231,43 @@ function updateTopBot(data, TorB){
       })
       .each("end", function(){ moving = false;})
 
-    console.log(steps);
+    updateSteps();
+      console.log(target[0][0], playerX, target[0][1],closestBlock[1])
+
+    if( target[0][0] === playerX && target[0][1] === closestBlock[1] && d3.select(currentObject).classed(target[0][3])){
+      console.log("yay");
+    }
   }
 
 //Keyboard Events
+var gameStarted = false;
 d3.select("body")
   .on("keydown", function() {
-    if( moving === false && currentObject !== null){
-      if( d3.event.keyCode === 37 ){
+    var key = d3.event.keyCode
+    if( moving === false && currentObject !== null && gameStarted){
+      if( key === 37 ){
         updateLeftRight(currentObject, "left"); 
       }
-      if( d3.event.keyCode === 39 ){
+      if( key === 39 ){
         updateLeftRight(currentObject, "right"); 
       }
-      if( d3.event.keyCode === 38 ){
+      if( key === 38 ){
         updateTopBot(currentObject, "top"); 
       }
-      if( d3.event.keyCode === 40 ){
+      if( key === 40 ){
         updateTopBot(currentObject, "bot"); 
       }      
     }
+    if( key === 83 ){
+      newGame();
+    }
+    if( gameStarted && key === 78 ){
+      nextRound();
+    }
+    if( gameStarted && key === 82 ){
+      restartPlayers();
+      updateSteps();
+    }
   });
+//press s to start new game
+//press n for next game

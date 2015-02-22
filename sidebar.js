@@ -46,23 +46,33 @@ var timerText = startBoard.selectAll('.startBoard')
   .attr("y", function(d,i){return 55 + (i * 65)})
   .attr("font-size", function(d){return d[1] + "px" })
   .attr("fill", "white")
+  .on("mouseover", function(){
+    d3.selectAll(".timerText").attr("fill", "green")
+  })
+  .on("mouseleave", function(){
+    d3.selectAll(".timerText").attr('fill', 'white')
+  })
   .on('click', function(d){
     if( !interval ){
       interval = setInterval(function(){
         timer -= 1;
         if( timer < 10 ){
-          d3.select('#timerText-1').transition().duration(50)
-            .attr("x", 64);
+          d3.select('#timerText-1').transition().duration(50).attr("x", 64);
         }
         d3.select("#timerText-1").text(timer);
         if( timer <= 0 ){
           clearInterval(interval);
-          interval = false;
-          timer = 60
         }
-      }, 100)
+      }, 1000)
+    } else {
+      clearInterval(interval);
+      interval = false;
+      timer = 60
+      d3.select('#timerText-1').transition().duration(50).attr("x", 49)
+      d3.select("#timerText-1").text(timer);
     }
   })
+
 
 var stepsBox = startBoard.selectAll('.startBoard')
   .data([0]).enter().append('rect')
@@ -178,17 +188,15 @@ var nextText = startBoard.selectAll('.startBoard')
   })
 
 var updateSteps = function(){
+  d3.select('#stepsText-1').attr("fill", "white");  
   if( steps === 0 ){
-    d3.select('#stepsText-1').transition().duration(50)
-      .attr("x", 64);
+    d3.select('#stepsText-1').transition().duration(50).attr("x", 64);
   }
   if( steps > 9 ){
-    d3.select('#stepsText-1').transition().duration(50)
-      .attr("x", 49);
+    d3.select('#stepsText-1').transition().duration(50).attr("x", 49);
   }
   if( steps > 99 ){
-    d3.select('#stepsText-1').transition().duration(50)
-      .attr("x", 34);
+    d3.select('#stepsText-1').transition().duration(50).attr("x", 34);
   }
   d3.select("#stepsText-1").text(steps);
 
@@ -224,6 +232,7 @@ var nextRound = function(){
 
 var restartPlayers = function(){
   steps = 0;
+  updateSteps();
   moving = false;
   for( var i = 0; i < player.data.length; i++ ){
     d3.select('#player-' + i).transition().duration(100)

@@ -1,3 +1,6 @@
+var target;
+var steps = 0;
+
 var tokenBoard = d3.selectAll('.bigboard')
   .data([0]).enter().append('svg')
   .attr('class', 'tokenBoard')
@@ -18,7 +21,7 @@ var startBoard = d3.selectAll('.bigboard')
   .data([0]).enter().append('svg')
   .attr('class', 'startBoard')
   .attr( 'width', 170 )
-  .attr( 'height', settings.height )
+  .attr( 'height', settings.height + 6 )
 
 var timerBox = startBoard.selectAll('.startBoard')
   .data([0]).enter().append('rect')
@@ -43,22 +46,33 @@ var timerText = startBoard.selectAll('.startBoard')
   .attr("y", function(d,i){return 55 + (i * 65)})
   .attr("font-size", function(d){return d[1] + "px" })
   .attr("fill", "white")
+  .on("mouseover", function(){
+    d3.selectAll(".timerText").attr("fill", "green")
+  })
+  .on("mouseleave", function(){
+    d3.selectAll(".timerText").attr('fill', 'white')
+  })
   .on('click', function(d){
     if( !interval ){
       interval = setInterval(function(){
         timer -= 1;
         if( timer < 10 ){
-          d3.select('#timerText-1').transition().duration(50)
-            .attr("x", 64);
+          d3.select('#timerText-1').transition().duration(50).attr("x", 64);
         }
         d3.select("#timerText-1").text(timer);
         if( timer <= 0 ){
           clearInterval(interval);
-          interval = false;
         }
-      }, 100)
+      }, 1000)
+    } else {
+      clearInterval(interval);
+      interval = false;
+      timer = 60
+      d3.select('#timerText-1').transition().duration(50).attr("x", 49)
+      d3.select("#timerText-1").text(timer);
     }
   })
+
 
 var stepsBox = startBoard.selectAll('.startBoard')
   .data([0]).enter().append('rect')
@@ -82,21 +96,107 @@ var stepsText = startBoard.selectAll('.startBoard')
   .attr("font-size", function(d){return d[1] + "px" })
   .attr("fill", "white")
 
-var target;
-var steps = 0;
-//target[0][0] - x, target[0][1] - y
-// console.log(target[0][3]);
-//when game ends - change token, step 0, 
-// d3.select(currentObject).classed(target[0][3]) - boolean
+var startBox = startBoard.selectAll('.startBoard')
+  .data([0]).enter().append('rect')
+  .attr('class', 'startBox')
+  .attr({
+    'x': 10,
+    'y': 320,
+    'rx': 5,
+    'ry': 5,
+    'width': 150,
+    'height': 50,
+  })
+
+var startText = startBoard.selectAll('.startBoard')
+  .data(["New Game"]).enter().append('text')
+  .attr('class', 'startText')
+  .text(function(d){ return d })
+  .attr("x", 29)
+  .attr("y", 353)
+  .attr("font-size", "25px")
+  .attr("fill", "white")
+  .on("mouseover", function(){
+    d3.select(this).attr("fill", "green")
+  })
+  .on("mouseleave", function(){
+    d3.select(this).attr('fill', 'white')
+  })
+  .on("click", function(){
+    newGame();
+  })
+
+var nextBox = startBoard.selectAll('.startBoard')
+  .data([0]).enter().append('rect')
+  .attr('class', 'nextBox')
+  .attr({
+    'x': 10,
+    'y': 375,
+    'rx': 5,
+    'ry': 5,
+    'width': 150,
+    'height': 50,
+  })
+
+var nextText = startBoard.selectAll('.startBoard')
+  .data(["Next Round"]).enter().append('text')
+  .attr('class', 'nextText')
+  .text(function(d){ return d })
+  .attr("x", 29)
+  .attr("y", 406)
+  .attr("font-size", "23px")
+  .attr("fill", "white")
+  .on("mouseover", function(){
+    d3.select(this).attr("fill", "green")
+  })
+  .on("mouseleave", function(){
+    d3.select(this).attr('fill', 'white')
+  })
+  .on("click", function(){
+    nextRound();
+  })
+
+
+var restartBox = startBoard.selectAll('.startBoard')
+  .data([0]).enter().append('rect')
+  .attr('class', 'restartBox')
+  .attr({
+    'x': 10,
+    'y': 430,
+    'rx': 5,
+    'ry': 5,
+    'width': 150,
+    'height': 50,
+  })
+
+var nextText = startBoard.selectAll('.startBoard')
+  .data(["Reset Players"]).enter().append('text')
+  .attr('class', 'nextText')
+  .text(function(d){ return d })
+  .attr("x", 23)
+  .attr("y", 461)
+  .attr("font-size", "23px")
+  .attr("fill", "white")
+  .on("mouseover", function(){
+    d3.select(this).attr("fill", "green")
+  })
+  .on("mouseleave", function(){
+    d3.select(this).attr('fill', 'white')
+  })
+  .on("click", function(){
+    restartPlayers();
+  })
 
 var updateSteps = function(){
+  d3.select('#stepsText-1').attr("fill", "white");  
   if( steps === 0 ){
-    d3.select('#stepsText-1').transition().duration(50)
-      .attr("x", 64);
+    d3.select('#stepsText-1').transition().duration(50).attr("x", 64);
   }
   if( steps > 9 ){
-    d3.select('#stepsText-1').transition().duration(50)
-      .attr("x", 49);
+    d3.select('#stepsText-1').transition().duration(50).attr("x", 49);
+  }
+  if( steps > 99 ){
+    d3.select('#stepsText-1').transition().duration(50).attr("x", 34);
   }
   d3.select("#stepsText-1").text(steps);
 
@@ -105,6 +205,7 @@ var updateSteps = function(){
 var newGame = function(){
   gameStarted = true;
   steps = 0;
+  moving = false;
   updateSteps();
   d3.selectAll('.endtarget').attr('class', 'tokens');
   d3.selectAll('.target').attr('class', 'tokens');
@@ -115,7 +216,8 @@ var newGame = function(){
 
 var nextRound = function(){
   d3.select("#token-" + target[0][4]).attr('class','endtarget')
-  steps = 0;   
+  steps = 0;
+  moving = false;  
   updateSteps();
   if( !copylandmark.length ){
     alert("end game");
@@ -123,10 +225,15 @@ var nextRound = function(){
   target = getTarget();
   d3.select("#token-" + target[0][4]).attr('class','target');
   }
+  //move players to new place
+  //reset timer
+
 }
 
 var restartPlayers = function(){
   steps = 0;
+  updateSteps();
+  moving = false;
   for( var i = 0; i < player.data.length; i++ ){
     d3.select('#player-' + i).transition().duration(100)
       .attr({

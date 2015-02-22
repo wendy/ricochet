@@ -167,6 +167,7 @@ function updateLeftRight(data, LorR){
   console.log(target[0][0], closestBlock[1], target[0][1],playerY)
   if( target[0][0] === closestBlock[1] && target[0][1] === playerY && d3.select(currentObject).classed(target[0][3]) ){
     console.log("yay");
+    d3.select('#stepsText-1').transition().duration(50).attr("fill", "green")
   }
 
 }
@@ -236,6 +237,7 @@ function updateTopBot(data, TorB){
 
     if( target[0][0] === playerX && target[0][1] === closestBlock[1] && d3.select(currentObject).classed(target[0][3])){
       console.log("yay");
+      d3.select('#stepsText-1').transition().duration(50).attr("fill", "green")
     }
   }
 
@@ -266,7 +268,6 @@ d3.select("body")
     }
     if( gameStarted && key === 82 ){
       restartPlayers();
-      updateSteps();
     }
   });
 //press s to start new game

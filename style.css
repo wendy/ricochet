@@ -38,7 +38,7 @@ body{
   float:left;
 }
 
-.timerBox .stepsBox{
+.timerBox .stepsBox .startBox .nextBox .restartBox{
   fill: black;
 }
 

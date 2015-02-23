@@ -170,7 +170,7 @@ var restartBox = startBoard.selectAll('.startBoard')
   })
 
 var nextText = startBoard.selectAll('.startBoard')
-  .data(["Reset Players"]).enter().append('text')
+  .data(["Reset Round"]).enter().append('text')
   .attr('class', 'nextText')
   .text(function(d){ return d })
   .attr("x", 23)
@@ -217,17 +217,15 @@ var newGame = function(){
 var nextRound = function(){
   d3.select("#token-" + target[0][4]).attr('class','endtarget')
   steps = 0;
-  moving = false;  
   updateSteps();
+  moving = false;  
   if( !copylandmark.length ){
     alert("end game");
   } else {
   target = getTarget();
   d3.select("#token-" + target[0][4]).attr('class','target');
   }
-  //move players to new place
-  //reset timer
-
+  movePlayers();
 }
 
 var restartPlayers = function(){
@@ -239,6 +237,16 @@ var restartPlayers = function(){
       .attr({
           cy: function(d){ return d3.select('#coaster-' + i)[0][0].y.animVal.value + player.offset},
           cx: function(d){ return d3.select('#coaster-' + i)[0][0].x.animVal.value + player.offset}
+      })
+  }
+}
+
+var movePlayers = function(){
+  for( var i = 0; i < player.data.length; i++ ){
+    d3.select('#coaster-' + i).transition().duration(100)
+      .attr({
+          y: function(d){ return d3.select('#player-' + i)[0][0].cy.animVal.value - player.offset},
+          x: function(d){ return d3.select('#player-' + i)[0][0].cx.animVal.value - player.offset}
       })
   }
 }

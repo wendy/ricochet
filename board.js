@@ -13,6 +13,7 @@ var board = d3.selectAll('.bigboard')
   .attr('class', 'board')
   .attr( 'width', settings.width )
   .attr( 'height', settings.height )
+  .style('margin-left', (settings.bodyW - 806)/2 + 'px')
   
 
 //Creates SVG Blocks on Board

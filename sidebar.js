@@ -7,6 +7,19 @@ var tokenBoard = d3.selectAll('.bigboard')
   .attr( 'width', settings.tokenH )
   .attr( 'height', settings.height )
 
+var tokenCurrentBox = tokenBoard.selectAll('.tokenCurrentBox')
+  .data([0]).enter().append('rect')
+  .attr('class', 'tokenCurrentBox')
+  .attr({
+    'x': 0,
+    'y': 11,
+    // 'rx': 5,
+    // 'ry': 5,
+    'width': 38,
+    'height': 42,
+  })
+
+
 var tokens = tokenBoard.selectAll('.tokens')
   .data(landmark).enter().append('text')
   .attr('class', 'tokens')
@@ -212,6 +225,7 @@ var newGame = function(){
   copylandmark = landmark.slice();
   target = getTarget();
   d3.select("#token-" + target[0][4]).attr('class','target');
+  moveTokenCurrentBox();
 }
 
 var nextRound = function(){
@@ -226,6 +240,7 @@ var nextRound = function(){
   d3.select("#token-" + target[0][4]).attr('class','target');
   }
   movePlayers();
+  moveTokenCurrentBox();
 }
 
 var restartPlayers = function(){
@@ -249,4 +264,12 @@ var movePlayers = function(){
           x: function(d){ return d3.select('#player-' + i)[0][0].cx.animVal.value - player.offset}
       })
   }
+}
+
+var moveTokenCurrentBox = function(){
+  var y = d3.select("#token-" + target[0][4])[0][0].y.animVal[0].value - 34;
+  d3.select('.tokenCurrentBox').transition().duration(100)
+      .attr({
+          y: function(d){ return y },
+      })
 }

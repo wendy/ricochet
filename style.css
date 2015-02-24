@@ -30,6 +30,12 @@ body{
   float:left;
 }
 
+.tokenCurrentBox{
+  fill: none;
+  stroke: red;
+  stroke-width: 4px;
+}
+
 .startBoard{
   margin-left: 5px;
   background-color: #1E1E1E;
@@ -43,14 +49,13 @@ body{
 }
 
 .target {
-  font-size: 40px;
 }
 
 .endtarget {
-  stroke: white;
+  fill: #FFEBD6;
+/*  stroke: white;
   stroke-width: 3px;
-  stroke-opacity: 0.5;
-
+  stroke-opacity: 0.5;*/
 }
 
 .blocks{

@@ -1,4 +1,5 @@
 var currentObject = null;
+vex.defaultOptions.className = 'vex-theme-os';
 
 
 //Creates SVG Body
@@ -271,5 +272,12 @@ d3.select("body")
       restartPlayers();
     }
   });
+
+
+// initial modal
+vex.dialog.open({
+  message: 'press s to start new game\n' +
+    'press n for next game'    
+});
 //press s to start new game
 //press n for next game
